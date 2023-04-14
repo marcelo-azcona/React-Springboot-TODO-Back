@@ -13,6 +13,7 @@ public class RestApiTodoApplication {
 		SpringApplication.run(RestApiTodoApplication.class, args);
 	}
 
+	// CORS config to allow comnunication between different localhosts
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
