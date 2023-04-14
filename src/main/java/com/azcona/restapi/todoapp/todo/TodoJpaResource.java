@@ -9,46 +9,50 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-// @RestController
-public class TodoResource {
+import com.azcona.restapi.todoapp.todo.repository.TodoRepository;
 
-	private TodoService todoService;
+@RestController
+public class TodoJpaResource {
 
-	public TodoResource(TodoService aTodoService) {
+	private TodoRepository todoRepository;
+
+	public TodoJpaResource(TodoRepository aTodoRepository) {
 		super();
-		this.todoService = aTodoService;
+		this.todoRepository = aTodoRepository;
 	}
 
 	@GetMapping("/users/{username}/todos")
 	private List<Todo> retrieveTodos(@PathVariable String username) {
-		return todoService.findByUsername(username);
+		return todoRepository.findByUsername(username);
 	}
 
 	@GetMapping("/users/{username}/todos/{id}")
 	private Todo retrieveTodo(@PathVariable String username, @PathVariable int id) {
-		return todoService.findById(id);
+		return todoRepository.findById(id).get();
 	}
 
 	@DeleteMapping("/users/{username}/todos/{id}")
 	private ResponseEntity<Void> deleteTodo(@PathVariable String username, @PathVariable int id) {
-		todoService.deleteById(id);
+		todoRepository.deleteById(id);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping("/users/{username}/todos/{id}")
 	private Todo updateTodo(@PathVariable String username, @PathVariable int id, @RequestBody Todo todo) {
-		todoService.updateTodo(todo);
+		todoRepository.save(todo);
 
 		return todo;
 	}
 
 	@PostMapping("/users/{username}/todos")
 	private Todo createTodo(@PathVariable String username, @RequestBody Todo todo) {
-		Todo createdTodo = todoService.addTodo(username, todo.getDescription(), todo.getTargetDate(), todo.isDone());
+		todo.setUsername(username);
+		todo.setId(null);
 
-		return createdTodo;
+		return todoRepository.save(todo);
 	}
 
 }
